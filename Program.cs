@@ -17,7 +17,11 @@ builder.Services.AddControllersWithViews(opc => {
 /* Configurando el DbContext */
 builder.Services.AddDbContext<ApplicationDbContext>(opc => opc.UseSqlServer("name=DefaultConnection"));
 
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication().AddMicrosoftAccount(opc => {
+    opc.ClientId = builder.Configuration["MicrosoftClientId"];
+    opc.ClientSecret = builder.Configuration["MicrosoftSecretId"];
+});
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opc => { 
     opc.SignIn.RequireConfirmedAccount = false;
 }).AddEntityFrameworkStores<ApplicationDbContext>()
