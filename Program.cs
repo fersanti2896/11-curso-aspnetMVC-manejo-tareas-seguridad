@@ -1,12 +1,18 @@
 using ManejoTareas;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var politicaUsuarioAutenticados = new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
+                                                                  .Build();
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(opc => {
+    opc.Filters.Add(new AuthorizeFilter(politicaUsuarioAutenticados));
+});
 
 /* Configurando el DbContext */
 builder.Services.AddDbContext<ApplicationDbContext>(opc => opc.UseSqlServer("name=DefaultConnection"));
