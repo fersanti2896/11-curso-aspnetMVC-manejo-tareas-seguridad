@@ -1,4 +1,5 @@
 ﻿using ManejoTareas.Models;
+using ManejoTareas.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -170,6 +171,35 @@ namespace ManejoTareas.Controllers {
             modelo.Mensaje = msg;
 
             return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> HacerAdmin(string email) { 
+            var usuario = await context.Users.Where(u => u.Email == email)
+                                             .FirstOrDefaultAsync();
+
+            if (usuario is null) {
+                return NotFound();
+            }
+
+            await userManager.AddToRoleAsync(usuario, Constantes.RolAdmin);
+
+            return RedirectToAction("Listado", routeValues: new { msg = $"Rol asignado correctamente a { email }" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoverAdmin(string email) {
+            var usuario = await context.Users.Where(u => u.Email == email)
+                                             .FirstOrDefaultAsync();
+
+            if (usuario is null)
+            {
+                return NotFound();
+            }
+
+            await userManager.RemoveFromRoleAsync(usuario, Constantes.RolAdmin);
+
+            return RedirectToAction("Listado", routeValues: new { msg = $"Rol removido correctamente a { email }" });
         }
     }
 }
