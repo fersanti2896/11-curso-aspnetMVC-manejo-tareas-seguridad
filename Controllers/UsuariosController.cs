@@ -160,6 +160,7 @@ namespace ManejoTareas.Controllers {
             return new ChallengeResult(proveedor, propiedades);
         }
 
+        [Authorize(Roles = Constantes.RolAdmin)]
         [HttpGet]
         public async Task<IActionResult> Listado(string msg = null) {
             var usuarios = await context.Users.Select(u => new UsuarioViewModel { 
@@ -173,6 +174,7 @@ namespace ManejoTareas.Controllers {
             return View(modelo);
         }
 
+        [Authorize(Roles = Constantes.RolAdmin)]
         [HttpPost]
         public async Task<IActionResult> HacerAdmin(string email) { 
             var usuario = await context.Users.Where(u => u.Email == email)
@@ -187,6 +189,7 @@ namespace ManejoTareas.Controllers {
             return RedirectToAction("Listado", routeValues: new { msg = $"Rol asignado correctamente a { email }" });
         }
 
+        [Authorize(Roles = Constantes.RolAdmin)]
         [HttpPost]
         public async Task<IActionResult> RemoverAdmin(string email) {
             var usuario = await context.Users.Where(u => u.Email == email)
