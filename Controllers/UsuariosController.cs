@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ManejoTareas.Controllers {
     public class UsuariosController : Controller {
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly ApplicationDbContext context;
 
         public UsuariosController(UserManager<IdentityUser> userManager, 
-                                  SignInManager<IdentityUser> signInManager) {
+                                  SignInManager<IdentityUser> signInManager,
+                                  ApplicationDbContext context) {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.context = context;
         }
 
         [AllowAnonymous]
@@ -153,6 +157,19 @@ namespace ManejoTareas.Controllers {
             var propiedades = signInManager.ConfigureExternalAuthenticationProperties(proveedor, urlRedireccion);
 
             return new ChallengeResult(proveedor, propiedades);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Listado(string msg = null) {
+            var usuarios = await context.Users.Select(u => new UsuarioViewModel { 
+                                                    Email = u.Email
+                                               }).ToListAsync();
+
+            var modelo = new UsuariosListadoViewModel();
+            modelo.Usuarios = usuarios;
+            modelo.Mensaje = msg;
+
+            return View(modelo);
         }
     }
 }
